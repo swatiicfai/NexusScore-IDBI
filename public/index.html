@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexusScore – MSME Financial Health Card | IDBI Innovate 2026</title>
+  <meta name="description" content="AI-driven multidimensional MSME Financial Health Card built for IDBI Innovate 2026. Powered by Neo4j, Account Aggregator, and Machine Learning." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #00c853;
+      --green-light: #69f0ae;
+      --gold: #ffd600;
+      --dark: #05090f;
+      --card: #0d1520;
+      --card2: #111c2d;
+      --border: rgba(0,200,83,0.18);
+      --text: #e8f5e9;
+      --muted: #7a9e8a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: rgba(5,9,15,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo { font-size: 1.3rem; font-weight: 800; color: var(--green-light); letter-spacing: -0.5px; }
+    .nav-logo span { color: var(--gold); }
+    .nav-badge {
+      background: linear-gradient(135deg, #003d1a, #006630);
+      border: 1px solid var(--green);
+      color: var(--green-light);
+      font-size: 0.75rem; font-weight: 600;
+      padding: 5px 14px; border-radius: 20px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 100px 5% 60px;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,200,83,0.12) 0%, transparent 70%);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300c853' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(0,200,83,0.12);
+      border: 1px solid var(--green);
+      color: var(--green-light);
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 1px;
+      padding: 6px 18px; border-radius: 20px;
+      margin-bottom: 28px;
+      animation: fadeInDown 0.6s ease both;
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 900; line-height: 1.08;
+      letter-spacing: -2px;
+      animation: fadeInUp 0.7s ease 0.1s both;
+    }
+    .hero h1 .accent { color: var(--green-light); }
+    .hero h1 .gold { color: var(--gold); }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted);
+      max-width: 680px;
+      margin: 22px auto 40px;
+      line-height: 1.7;
+      animation: fadeInUp 0.7s ease 0.2s both;
+    }
+    .hero-cta {
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+      animation: fadeInUp 0.7s ease 0.3s both;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #00c853, #00e676);
+      color: #000;
+      font-weight: 700; font-size: 1rem;
+      padding: 14px 32px; border-radius: 12px; border: none;
+      cursor: pointer; text-decoration: none;
+      box-shadow: 0 0 32px rgba(0,200,83,0.4);
+      transition: all 0.25s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 48px rgba(0,200,83,0.6); }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--green);
+      color: var(--green-light);
+      font-weight: 600; font-size: 1rem;
+      padding: 14px 32px; border-radius: 12px;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.25s;
+    }
+    .btn-outline:hover { background: rgba(0,200,83,0.1); }
+
+    /* ── SCORE CARD ── */
+    .score-section {
+      padding: 80px 5%;
+      display: flex; align-items: center; justify-content: center;
+      gap: 60px; flex-wrap: wrap;
+    }
+    .score-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      width: 320px;
+      box-shadow: 0 0 60px rgba(0,200,83,0.08);
+      position: relative;
+    }
+    .score-card-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .score-card-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; }
+    .score-card-tag { font-size: 0.8rem; color: var(--muted); margin-bottom: 32px; }
+    .score-ring {
+      width: 160px; height: 160px;
+      margin: 0 auto 24px;
+      position: relative;
+    }
+    .score-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .score-ring-bg { fill: none; stroke: rgba(0,200,83,0.12); stroke-width: 10; }
+    .score-ring-fill {
+      fill: none; stroke: url(#scoreGrad); stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 408;
+      stroke-dashoffset: 90;
+      animation: ringFill 2s ease 0.5s both;
+    }
+    @keyframes ringFill { from { stroke-dashoffset: 408; } to { stroke-dashoffset: 90; } }
+    .score-value {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 2.5rem; font-weight: 900; color: var(--green-light);
+      transform: rotate(0deg);
+    }
+    .score-value span { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+    .score-traffic {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(0,200,83,0.08); border-radius: 10px; padding: 12px 16px;
+      font-weight: 600; font-size: 0.95rem; color: var(--green-light);
+    }
+    .traffic-dot {
+      width: 14px; height: 14px; border-radius: 50%; background: var(--green);
+      box-shadow: 0 0 12px var(--green); animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 8px var(--green)} 50%{box-shadow:0 0 20px var(--green)} }
+    .score-metrics { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .metric { display: flex; justify-content: space-between; align-items: center; }
+    .metric-label { font-size: 0.85rem; color: var(--muted); }
+    .metric-bar-wrap { width: 120px; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+    .metric-bar { height: 100%; border-radius: 4px; animation: barGrow 1.5s ease both; }
+    @keyframes barGrow { from { width: 0 !important; } }
+
+    /* ── INFO ── */
+    .info-wrap { max-width: 520px; }
+    .info-wrap h2 { font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+    .info-wrap p { color: var(--muted); line-height: 1.8; font-size: 1rem; margin-bottom: 24px; }
+    .info-steps { display: flex; flex-direction: column; gap: 14px; }
+    .step { display: flex; gap: 14px; align-items: flex-start; }
+    .step-num {
+      min-width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #00c853, #00e676);
+      color: #000; font-weight: 800; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-text { font-size: 0.95rem; color: var(--text); padding-top: 4px; }
+
+    /* ── FEATURES ── */
+    .features { padding: 80px 5%; text-align: center; }
+    .section-title { font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+    .section-sub { color: var(--muted); font-size: 1rem; max-width: 560px; margin: 0 auto 50px; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px; padding: 28px 24px;
+      text-align: left; transition: all 0.3s;
+    }
+    .feature-card:hover { transform: translateY(-4px); border-color: var(--green); box-shadow: 0 0 30px rgba(0,200,83,0.1); }
+    .feature-icon { font-size: 2rem; margin-bottom: 14px; }
+    .feature-title { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .feature-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── TECH STACK ── */
+    .tech { padding: 80px 5%; background: linear-gradient(to bottom, transparent, rgba(0,200,83,0.04), transparent); }
+    .tech-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 800px; margin: 0 auto; }
+    .tech-pill {
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: 50px; padding: 10px 20px;
+      font-size: 0.9rem; font-weight: 600; color: var(--text);
+      transition: all 0.2s;
+    }
+    .tech-pill:hover { border-color: var(--green); color: var(--green-light); }
+
+    /* ── STATS ── */
+    .stats { padding: 60px 5%; text-align: center; }
+    .stats-grid { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px 40px; min-width: 180px;
+    }
+    .stat-value { font-size: 2.4rem; font-weight: 900; color: var(--green-light); }
+    .stat-label { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 32px 5%; text-align: center;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem; color: var(--muted);
+    }
+    footer a { color: var(--green-light); text-decoration: none; }
+    footer strong { color: var(--text); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeInDown { from { opacity:0; transform:translateY(-20px);} to { opacity:1; transform:translateY(0);} }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(20px);} to { opacity:1; transform:translateY(0);} }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">Nexus<span>Score</span></div>
+  <div class="nav-badge">🏆 IDBI Innovate 2026</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">Problem Statement 3 · Financial Health Score</div>
+  <h1>
+    The <span class="accent">Financial Health Card</span><br/>
+    Every <span class="gold">MSME</span> Deserves
+  </h1>
+  <p class="hero-sub">
+    NexusScore aggregates GST, UPI, EPFO, and Account Aggregator data into a live graph network — computing a real-time, multidimensional credit score for India's 63 million credit-invisible MSMEs.
+  </p>
+  <div class="hero-cta">
+    <a href="#score" class="btn-primary">See Live Score Card →</a>
+    <a href="https://github.com/swatiicfai/NexusScore-IDBI" target="_blank" class="btn-outline">View on GitHub</a>
+  </div>
+</section>
+
+<!-- SCORE DEMO -->
+<section class="score-section" id="score">
+  <div class="score-card">
+    <div class="score-card-label">MSME Financial Health Card</div>
+    <div class="score-card-name">Ramesh Textiles Pvt. Ltd.</div>
+    <div class="score-card-tag">GSTIN: 27AAACR1234A1Z5 · Mumbai</div>
+    <div class="score-ring">
+      <svg viewBox="0 0 140 140">
+        <defs>
+          <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#00c853"/>
+            <stop offset="100%" stop-color="#00e676"/>
+          </linearGradient>
+        </defs>
+        <circle class="score-ring-bg" cx="70" cy="70" r="65"/>
+        <circle class="score-ring-fill" cx="70" cy="70" r="65"/>
+      </svg>
+      <div class="score-value">762<span>/900</span></div>
+    </div>
+    <div class="score-traffic">
+      <div class="traffic-dot"></div>
+      Low Risk · Creditworthy
+    </div>
+    <div class="score-metrics">
+      <div class="metric">
+        <span class="metric-label">Cash Flow Consistency</span>
+        <div class="metric-bar-wrap"><div class="metric-bar" style="width:82%;background:linear-gradient(90deg,#00c853,#69f0ae)"></div></div>
+      </div>
+      <div class="metric">
+        <span class="metric-label">GST Compliance</span>
+        <div class="metric-bar-wrap"><div class="metric-bar" style="width:91%;background:linear-gradient(90deg,#00c853,#69f0ae)"></div></div>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Supply Chain Health</span>
+        <div class="metric-bar-wrap"><div class="metric-bar" style="width:74%;background:linear-gradient(90deg,#ffd600,#ffff00)"></div></div>
+      </div>
+      <div class="metric">
+        <span class="metric-label">UPI Transaction Volume</span>
+        <div class="metric-bar-wrap"><div class="metric-bar" style="width:88%;background:linear-gradient(90deg,#00c853,#69f0ae)"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-wrap">
+    <h2>How <span style="color:var(--green-light)">NexusScore</span> Works</h2>
+    <p>We replace the traditional credit file with a living, breathing financial graph — updated in real time from India's open finance ecosystem.</p>
+    <div class="info-steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">MSME gives one-time consent via <strong>Account Aggregator</strong> framework.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">We auto-pull <strong>GST returns, UPI flow, EPFO, and bank statements</strong> without manual paperwork.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Neo4j Graph Engine</strong> maps supplier-buyer-transaction networks to detect hidden supply-chain risk.</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><strong>ML Scoring Engine (XGBoost)</strong> computes a 300–900 multidimensional Financial Health Score.</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">IDBI loan officers see a <strong>Traffic Light Dashboard</strong> and approve credit in seconds.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <h2 class="section-title">Key Features</h2>
+  <p class="section-sub">Every feature is designed to close the financial inclusion gap for India's MSMEs.</p>
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon">🔄</div><div class="feature-title">Alternate Data Ingestion</div><div class="feature-desc">Automated parsing of GSTIN returns, UPI volume, and EPFO stability via the Account Aggregator framework — zero paperwork.</div></div>
+    <div class="feature-card"><div class="feature-icon">📊</div><div class="feature-title">Multidimensional Scoring</div><div class="feature-desc">ML-weighted score (300–900) across cash flow, supply chain health, statutory compliance, and UPI transaction velocity.</div></div>
+    <div class="feature-card"><div class="feature-icon">🚦</div><div class="feature-title">Visual Risk Dashboard</div><div class="feature-desc">Clean Traffic Light UI for IDBI loan officers with instant drill-down into specific risk signals and anomalies.</div></div>
+    <div class="feature-card"><div class="feature-icon">🕸️</div><div class="feature-title">Supply Chain Graphing</div><div class="feature-desc">Identifies if an MSME is over-reliant on a single failing buyer by mapping B2B transaction graphs in Neo4j.</div></div>
+    <div class="feature-card"><div class="feature-icon">⚡</div><div class="feature-title">OCEN Integration</div><div class="feature-desc">API-ready for the Open Credit Enablement Network — enabling seamless one-click loan origination and disbursement.</div></div>
+    <div class="feature-card"><div class="feature-icon">🔮</div><div class="feature-title">Predictive Risk</div><div class="feature-desc">Predicts future cash-flow crunches using ML models on live UPI velocity — enabling proactive intervention before defaults occur.</div></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-value">63M+</div><div class="stat-label">Target MSMEs in India</div></div>
+    <div class="stat-card"><div class="stat-value">300–900</div><div class="stat-label">Health Score Range</div></div>
+    <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">Alternate Data Sources</div></div>
+    <div class="stat-card"><div class="stat-value">&lt;$0.06</div><div class="stat-label">Cost Per Credit Decision</div></div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section class="tech">
+  <h2 class="section-title" style="text-align:center; margin-bottom:12px;">Tech Stack</h2>
+  <p class="section-sub" style="text-align:center; margin-bottom:32px;">Built on best-in-class, production-ready technologies.</p>
+  <div class="tech-grid">
+    <div class="tech-pill">React.js</div>
+    <div class="tech-pill">Next.js</div>
+    <div class="tech-pill">Node.js</div>
+    <div class="tech-pill">Python FastAPI</div>
+    <div class="tech-pill">Neo4j AuraDB</div>
+    <div class="tech-pill">XGBoost</div>
+    <div class="tech-pill">Scikit-Learn</div>
+    <div class="tech-pill">AWS EC2</div>
+    <div class="tech-pill">PostgreSQL</div>
+    <div class="tech-pill">Docker</div>
+    <div class="tech-pill">Account Aggregator APIs</div>
+    <div class="tech-pill">OCEN APIs</div>
+    <div class="tech-pill">ULI Ecosystem</div>
+    <div class="tech-pill">GitHub Actions</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p><strong>NexusFin AI</strong> · Built for <a href="https://hack2skill.com/event/idbinnovate" target="_blank">IDBI Innovate 2026</a> · Team Leader: Swati Gupta</p>
+  <p style="margin-top:8px;"><a href="https://github.com/swatiicfai/NexusScore-IDBI" target="_blank">GitHub Repository</a> · Problem Statement 3: Financial Health Score</p>
+</footer>
+
+</body>
+</html>
